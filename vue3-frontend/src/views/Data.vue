@@ -94,6 +94,9 @@
 import { Search } from "@element-plus/icons-vue";
 import { onMounted, reactive, ref } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
+import { useAuthStore } from '../stores/auth'
+
+const authStore = useAuthStore()
 
 const data = reactive({
   name: '',
@@ -113,7 +116,10 @@ const fetchData = async () => {
     })
     const res = await fetch(`/api/admin/list?${params.toString()}`, {
       method: 'GET',
-      headers: { 'Content-Type': 'application/json' }
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': authStore.getAuthorizationHeader()
+      }
     })
 
     const result = await res.json()
@@ -211,7 +217,10 @@ const confirmSave = async () => {
   try {
     const res = await fetch(url, {
       method,
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': authStore.getAuthorizationHeader()
+      },
       body: JSON.stringify({
         id: formData.id,
         username: formData.username,
@@ -283,7 +292,10 @@ const handleBatchDelete = () => {
     type: 'warning'
   }).then(async () => {
     try {
-      const res = await fetch(`/api/admin/batchDelete?ids=${selectedIds.value.join(',')}`, { method: 'DELETE' })
+      const res = await fetch(`/api/admin/batchDelete?ids=${selectedIds.value.join(',')}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': authStore.getAuthorizationHeader() }
+      })
       const result = await res.json()
 
       if (result.code === 200) {

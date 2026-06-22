@@ -66,15 +66,17 @@
 import { RouterView } from 'vue-router'
 import { useRouter, useRoute } from 'vue-router'
 import { HomeFilled, Monitor, TrendCharts, Aim, Setting } from '@element-plus/icons-vue'
+import { useAuthStore } from '../stores/auth'
 
 const router = useRouter()
 const route = useRoute()
+const authStore = useAuthStore()
 
-// 从本地存储读取登录用户信息
-const loginUser = JSON.parse(localStorage.getItem('loginUser') || 'null')
+// 从 authStore 获取当前登录用户信息
+const loginUser = authStore.user
 
 const handleLogout = () => {
-  localStorage.removeItem('loginUser')
+  authStore.logout()
   router.push('/login')
 }
 </script>

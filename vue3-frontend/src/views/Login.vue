@@ -38,9 +38,13 @@ import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { User, Lock, Key } from '@element-plus/icons-vue'
 import ValidCode from '../components/ValidCode.vue'
+import { useAuthStore } from '../stores/auth'
 
 const router = useRouter()
+const authStore = useAuthStore()
 const loading = ref(false)
+// 验证码组件引用（用于刷新验证码）
+const validCodeRef = ref(null)
 
 const formData = reactive({
   username: '',
@@ -90,11 +94,14 @@ const handleLogin = async () => {
 
     if (result.code === 200) {
       ElMessage.success('登录成功')
-      // 保存用户信息到本地
-      localStorage.setItem('loginUser', JSON.stringify(result.data))
+      // 使用 Pinia authStore 保存登录状态
+      authStore.login(result.data)
       router.push('/Manager/Home')
     } else {
       ElMessage.error(result.message || '用户名或密码错误')
+      // 刷新验证码
+      formData.code = ''
+      validCodeValue = ''
     }
   } catch (error) {
     console.error('登录请求失败：', error)

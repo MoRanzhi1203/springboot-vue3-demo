@@ -1,4 +1,7 @@
 -- ==================== 用户管理表 ====================
+-- 兼容已有表：补充 deleted 逻辑删除列（列已存在时自动跳过）
+ALTER TABLE `admin` ADD COLUMN IF NOT EXISTS `deleted` TINYINT DEFAULT 0 COMMENT '逻辑删除：0未删除，1已删除';
+
 CREATE TABLE IF NOT EXISTS `admin` (
     `id`       BIGINT       NOT NULL AUTO_INCREMENT COMMENT '主键ID',
     `username` VARCHAR(50)  NOT NULL                COMMENT '账号',

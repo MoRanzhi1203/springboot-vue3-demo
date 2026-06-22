@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { useAuthStore } from '../stores/auth'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -30,14 +31,22 @@ const router = createRouter({
   ],
 })
 
+// ==================== 路由白名单 ====================
+// 无需登录即可访问的页面
+const whiteList = ['/login', '/register']
+
 // ==================== 路由守卫 ====================
 router.beforeEach((to, from, next) => {
-  const isLoggedIn = !!localStorage.getItem('loginUser')
+  // 每次路由跳转时恢复会话
+  const authStore = useAuthStore()
+  authStore.restoreSession()
+
+  const isLoggedIn = authStore.isLoggedIn
 
   // 如果访问后台页面且未登录，跳转到登录页
   if (to.path.startsWith('/Manager') && !isLoggedIn) {
     next('/login')
-  } else if ((to.path === '/login' || to.path === '/register') && isLoggedIn) {
+  } else if (whiteList.includes(to.path) && isLoggedIn) {
     // 已登录用户访问登录/注册页，直接跳转到后台首页
     next('/Manager/Home')
   } else {
