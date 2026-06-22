@@ -17,7 +17,6 @@ const router = createRouter({
       children: [
         { path: 'Home', name: 'ManagerHome', component: () => import('../views/Home.vue') },
         { path: 'Data', name: 'ManagerData', component: () => import('../views/Data.vue') },
-        // 双碳平台页面（占位）
         { path: 'Monitor', name: 'Monitor', component: () => import('../views/Monitor.vue') },
         { path: 'Analysis', name: 'Analysis', component: () => import('../views/Analysis.vue') },
         { path: 'Emission', name: 'Emission', component: () => import('../views/Emission.vue') },
@@ -37,11 +36,8 @@ const whiteList = ['/login', '/register']
 
 // ==================== 路由守卫 ====================
 router.beforeEach((to, from, next) => {
-  // 每次路由跳转时恢复会话
-  const authStore = useAuthStore()
-  authStore.restoreSession()
-
-  const isLoggedIn = authStore.isLoggedIn
+  // 优先读取 localStorage 判断登录状态，避免 Pinia 初始化时序问题
+  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true'
 
   // 如果访问后台页面且未登录，跳转到登录页
   if (to.path.startsWith('/Manager') && !isLoggedIn) {

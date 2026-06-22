@@ -17,7 +17,7 @@
 
     <!-- 数据表格 -->
     <div class="card" style="margin-top: 5px; margin-bottom: 5px">
-      <el-table :data="data.tableData" border style="width: 100%" @selection-change="handleSelectionChange">
+      <el-table ref="tableRef" :data="data.tableData" border style="width: 100%" @selection-change="handleSelectionChange">
         <el-table-column type="selection" width="55" />
         <el-table-column prop="id" label="ID" width="80" />
         <el-table-column prop="username" label="账号" />
@@ -49,7 +49,7 @@
 
     <!-- 弹窗（新增/编辑）-->
     <div>
-      <el-dialog v-model="dialogVisible" :title="isEdit ? '编辑成员' : '添加成员'" width="500px" @close="resetForm">
+      <el-dialog v-model="dialogVisible" :title="isEdit ? '编辑用户' : '添加用户'" width="500px" @close="resetForm">
         <el-form :model="formData" label-width="60px">
           <el-form-item label="账号">
             <el-input v-model="formData.username" autocomplete="off" />
@@ -94,9 +94,11 @@
 import { Search } from "@element-plus/icons-vue";
 import { onMounted, reactive, ref } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
-import { useAuthStore } from '../stores/auth'
+import { useAuthStore } from '@/stores/auth.js'
 
 const authStore = useAuthStore()
+// 表格组件引用
+const tableRef = ref(null)
 
 const data = reactive({
   name: '',
@@ -211,6 +213,7 @@ const closeDialog = () => {
 }
 
 const confirmSave = async () => {
+  // 编辑时用 PUT / 新增时用 POST
   const url = isEdit.value ? '/api/admin/update' : '/api/admin/add'
   const method = isEdit.value ? 'PUT' : 'POST'
 
@@ -263,7 +266,10 @@ const handleDelete = (id) => {
     type: 'warning'
   }).then(async () => {
     try {
-      const res = await fetch(`/api/admin/delete/${id}`, { method: 'DELETE' })
+      const res = await fetch(`/api/admin/delete/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': authStore.getAuthorizationHeader() }
+      })
       const result = await res.json()
 
       if (result.code === 200) {
@@ -301,6 +307,10 @@ const handleBatchDelete = () => {
       if (result.code === 200) {
         ElMessage.success('批量删除成功')
         selectedIds.value = []
+        // 清空表格选择状态
+        if (tableRef.value) {
+          tableRef.value.clearSelection()
+        }
         fetchData()
       } else {
         ElMessage.error(result.message || '批量删除失败')

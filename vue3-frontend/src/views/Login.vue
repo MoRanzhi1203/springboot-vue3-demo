@@ -16,7 +16,7 @@
         <el-form-item>
           <div style="display: flex; gap: 10px">
             <el-input v-model="formData.code" placeholder="验证码" :prefix-icon="Key" style="flex: 1" />
-            <ValidCode @update:value="getValidCode" />
+            <ValidCode ref="validCodeRef" v-model="validCode" />
           </div>
         </el-form-item>
 
@@ -45,6 +45,8 @@ const authStore = useAuthStore()
 const loading = ref(false)
 // 验证码组件引用（用于刷新验证码）
 const validCodeRef = ref(null)
+// 验证码 v-model
+const validCode = ref('')
 
 const formData = reactive({
   username: '',
@@ -52,31 +54,28 @@ const formData = reactive({
   code: ''
 })
 
-// 验证码正确的值
-let validCodeValue = ''
-
-const getValidCode = (value) => {
-  validCodeValue = value
-}
-
 const handleLogin = async () => {
   // 参数校验
   if (!formData.username) {
     ElMessage.warning('请输入账号')
+    refreshCaptcha()
     return
   }
   if (!formData.userpwd) {
     ElMessage.warning('请输入密码')
+    refreshCaptcha()
     return
   }
   if (!formData.code) {
     ElMessage.warning('请输入验证码')
+    refreshCaptcha()
     return
   }
 
   // 验证码校验（不区分大小写）
-  if (formData.code.toLowerCase() !== validCodeValue.toLowerCase()) {
+  if (formData.code.toLowerCase() !== validCode.value.toLowerCase()) {
     ElMessage.error('验证码错误')
+    refreshCaptcha()
     return
   }
 
@@ -99,15 +98,22 @@ const handleLogin = async () => {
       router.push('/Manager/Home')
     } else {
       ElMessage.error(result.message || '用户名或密码错误')
-      // 刷新验证码
-      formData.code = ''
-      validCodeValue = ''
+      refreshCaptcha()
     }
   } catch (error) {
     console.error('登录请求失败：', error)
     ElMessage.error('网络连接失败，请确认后端服务已启动')
+    refreshCaptcha()
   } finally {
     loading.value = false
+  }
+}
+
+// 刷新验证码
+const refreshCaptcha = () => {
+  formData.code = ''
+  if (validCodeRef.value) {
+    validCodeRef.value.refreshCode()
   }
 }
 </script>

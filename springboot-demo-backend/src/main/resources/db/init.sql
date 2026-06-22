@@ -1,6 +1,12 @@
 -- ==================== 用户管理表 ====================
 -- 兼容已有表：补充 deleted 逻辑删除列（列已存在时自动跳过）
 ALTER TABLE `admin` ADD COLUMN IF NOT EXISTS `deleted` TINYINT DEFAULT 0 COMMENT '逻辑删除：0未删除，1已删除';
+-- 兼容旧表：确保 name/sex/tel/headurl 允许 NULL
+ALTER TABLE `admin` MODIFY COLUMN `name` VARCHAR(50) DEFAULT NULL COMMENT '姓名';
+ALTER TABLE `admin` MODIFY COLUMN `sex` VARCHAR(10) DEFAULT NULL COMMENT '性别';
+ALTER TABLE `admin` MODIFY COLUMN `tel` VARCHAR(20) DEFAULT NULL COMMENT '电话';
+ALTER TABLE `admin` MODIFY COLUMN `headurl` VARCHAR(255) DEFAULT NULL COMMENT '头像地址';
+ALTER TABLE `admin` MODIFY COLUMN `userpwd` VARCHAR(100) NOT NULL COMMENT '密码';
 
 CREATE TABLE IF NOT EXISTS `admin` (
     `id`       BIGINT       NOT NULL AUTO_INCREMENT COMMENT '主键ID',

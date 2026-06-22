@@ -22,6 +22,7 @@ export const useAuthStore = defineStore('auth', () => {
     }))
 
     // 持久化到 localStorage
+    localStorage.setItem('isLoggedIn', 'true')
     saveToLocalStorage()
   }
 
@@ -34,6 +35,7 @@ export const useAuthStore = defineStore('auth', () => {
     localStorage.removeItem('auth_user')
     localStorage.removeItem('auth_token')
     localStorage.removeItem('loginUser') // 兼容旧版存储
+    localStorage.removeItem('isLoggedIn')
   }
 
   // ==================== 恢复会话 ====================
@@ -45,6 +47,7 @@ export const useAuthStore = defineStore('auth', () => {
       try {
         user.value = JSON.parse(savedUser)
         token.value = savedToken
+        localStorage.setItem('isLoggedIn', 'true')
       } catch (e) {
         // 数据损坏，清除
         logout()

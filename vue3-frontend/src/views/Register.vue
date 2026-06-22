@@ -18,6 +18,13 @@
         </el-form-item>
 
         <el-form-item>
+          <el-select v-model="formData.sex" placeholder="请选择性别" style="width: 100%">
+            <el-option label="男" value="男" />
+            <el-option label="女" value="女" />
+          </el-select>
+        </el-form-item>
+
+        <el-form-item>
           <el-input v-model="formData.tel" placeholder="请输入电话" :prefix-icon="Phone" />
         </el-form-item>
 
@@ -46,6 +53,7 @@ const formData = reactive({
   username: '',
   userpwd: '',
   name: '',
+  sex: '',
   tel: ''
 })
 
@@ -63,6 +71,14 @@ const handleRegister = async () => {
     ElMessage.warning('请输入姓名')
     return
   }
+  if (!formData.sex) {
+    ElMessage.warning('请选择性别')
+    return
+  }
+  if (!formData.tel) {
+    ElMessage.warning('请输入电话')
+    return
+  }
 
   loading.value = true
   try {
@@ -73,7 +89,9 @@ const handleRegister = async () => {
         username: formData.username,
         userpwd: formData.userpwd,
         name: formData.name,
-        tel: formData.tel
+        sex: formData.sex,
+        tel: formData.tel,
+        headurl: ''
       })
     })
     const result = await res.json()

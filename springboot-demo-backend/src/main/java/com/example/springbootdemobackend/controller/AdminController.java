@@ -24,14 +24,22 @@ public class AdminController {
     @PostMapping("/add")
     @Operation(summary = "新增用户")
     public R<Void> add(@RequestBody Admin admin) {
+        // 检查用户名是否已存在
+        LambdaQueryWrapper<Admin> checkWrapper = new LambdaQueryWrapper<>();
+        checkWrapper.eq(Admin::getUsername, admin.getUsername());
+        long count = adminService.count(checkWrapper);
+        if (count > 0) {
+            return R.fail("用户名已存在");
+        }
         adminService.save(admin);
-        return R.success();
+        return R.success("添加成功");
     }
 
     // ==================== 分页列表查询 ====================
     @GetMapping("/list")
     @Operation(summary = "分页列表查询")
     public R<PageInfo<Admin>> list(@RequestParam(required = false) String name,
+                                   @RequestParam(required = false) String tel,
                                    @RequestParam(required = false) String username,
                                    @RequestParam(defaultValue = "1") Integer pagenum,
                                    @RequestParam(defaultValue = "10") Integer pagesize) {
@@ -40,6 +48,11 @@ public class AdminController {
         // 姓名模糊查询
         if (ObjectUtils.isNotEmpty(name)) {
             adminWrapper.like(Admin::getName, name);
+        }
+
+        // 电话模糊查询
+        if (ObjectUtils.isNotEmpty(tel)) {
+            adminWrapper.like(Admin::getTel, tel);
         }
 
         // 账号模糊查询
@@ -93,10 +106,7 @@ public class AdminController {
     @PostMapping("/login")
     @Operation(summary = "用户登录")
     public R<Admin> login(@RequestBody Admin admin) {
-        LambdaQueryWrapper<Admin> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(Admin::getUsername, admin.getUsername())
-               .eq(Admin::getPassword, admin.getPassword());
-        Admin loginUser = adminService.getOne(wrapper);
+        Admin loginUser = adminService.login(admin.getUsername(), admin.getPassword());
         if (loginUser != null) {
             // 登录成功，清除密码再返回
             loginUser.setPassword(null);
@@ -109,14 +119,10 @@ public class AdminController {
     @PostMapping("/register")
     @Operation(summary = "用户注册")
     public R<Void> register(@RequestBody Admin admin) {
-        // 检查用户名是否已存在
-        LambdaQueryWrapper<Admin> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(Admin::getUsername, admin.getUsername());
-        long count = adminService.count(wrapper);
-        if (count > 0) {
-            return R.fail("用户已存在");
+        boolean success = adminService.register(admin);
+        if (success) {
+            return R.success("注册成功");
         }
-        adminService.save(admin);
-        return R.success("注册成功");
+        return R.fail("用户名已存在");
     }
 }

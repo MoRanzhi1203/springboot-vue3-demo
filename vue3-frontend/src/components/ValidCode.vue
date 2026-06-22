@@ -1,20 +1,25 @@
 <template>
-  <div class="validcode-container" @click="drawCode" style="cursor: pointer">
+  <div class="validcode-container" @click="refreshCode" style="cursor: pointer">
     <canvas ref="canvas" width="100" height="36"></canvas>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, defineEmits } from 'vue'
+import { ref, onMounted } from 'vue'
 
-const emit = defineEmits(['update:value'])
+// 支持 v-model
+const props = defineProps({
+  modelValue: { type: String, default: '' }
+})
+const emit = defineEmits(['update:modelValue'])
+
 const canvas = ref(null)
 
 let codeValue = ''
 
-// 生成随机验证码
+// 生成随机验证码（排除容易混淆的 O、0、I、l）
 const generateCode = () => {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789'
+  const chars = 'ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789'
   let result = ''
   for (let i = 0; i < 4; i++) {
     result += chars.charAt(Math.floor(Math.random() * chars.length))
@@ -55,8 +60,14 @@ const drawCode = () => {
   }
 
   // 发送验证码值给父组件
-  emit('update:value', codeValue)
+  emit('update:modelValue', codeValue)
 }
+
+// 暴露给父组件调用
+const refreshCode = () => {
+  drawCode()
+}
+defineExpose({ refreshCode })
 
 onMounted(() => {
   drawCode()
