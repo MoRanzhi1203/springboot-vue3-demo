@@ -8,9 +8,11 @@
     </div>
 
     <!-- 操作按钮 -->
-    <div>
+    <div style="margin-top: 5px">
       <el-button type="primary" @click="openAddDialog">新增</el-button>
       <el-button type="danger" @click="handleBatchDelete" :disabled="selectedIds.length === 0">批量删除</el-button>
+      <el-button type="warning" @click="handleImport">导入</el-button>
+      <el-button type="success" @click="handleExport">导出</el-button>
     </div>
 
     <!-- 数据表格 -->
@@ -301,6 +303,15 @@ const handleBatchDelete = () => {
 onMounted(() => {
   fetchData()
 })
+
+// ==================== 导入 / 导出（占位） ====================
+const handleImport = () => {
+  ElMessage.info('导入功能开发中，敬请期待')
+}
+
+const handleExport = () => {
+  ElMessage.info('导出功能开发中，敬请期待')
+}
 </script>
 
 <style scoped>

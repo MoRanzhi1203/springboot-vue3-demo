@@ -1,74 +1,63 @@
 <template>
-  <div class="home-container">
-    <el-card class="welcome-card">
-      <template #header>
-        <div class="card-header">
-          <span class="welcome-text">欢迎使用后台管理系统</span>
-        </div>
-      </template>
-      <div class="welcome-content">
-        <el-row :gutter="20">
-          <el-col :span="6">
-            <el-statistic title="用户总数" :value="userCount">
-              <template #prefix>
-                <el-icon><User /></el-icon>
-              </template>
-            </el-statistic>
-          </el-col>
-          <el-col :span="6">
-            <el-statistic title="数据总量" :value="dataCount">
-              <template #prefix>
-                <el-icon><Document /></el-icon>
-              </template>
-            </el-statistic>
-          </el-col>
-          <el-col :span="6">
-            <el-statistic title="今日访问" :value="visitCount">
-              <template #prefix>
-                <el-icon><View /></el-icon>
-              </template>
-            </el-statistic>
-          </el-col>
-          <el-col :span="6">
-            <el-statistic title="系统消息" :value="messageCount">
-              <template #prefix>
-                <el-icon><Bell /></el-icon>
-              </template>
-            </el-statistic>
-          </el-col>
-        </el-row>
-      </div>
-    </el-card>
+  <div class="dashboard-container">
+    <h1 style="margin-bottom: 20px">数据概览仪表盘</h1>
 
-    <el-row :gutter="20" style="margin-top: 20px;">
-      <el-col :span="12">
-        <el-card>
-          <template #header>
-            <div class="card-header">
-              <span>快捷操作</span>
-            </div>
-          </template>
-          <div class="quick-actions">
-            <el-button type="primary" @click="goToData">数据管理</el-button>
-            <el-button type="success" @click="goToUsers">用户管理</el-button>
-            <el-button type="warning" @click="viewStats">查看统计</el-button>
-            <el-button type="info" @click="openSettings">系统设置</el-button>
-          </div>
+    <!-- 指标卡片 -->
+    <el-row :gutter="20">
+      <el-col :span="6">
+        <el-card class="stat-card" shadow="hover">
+          <el-statistic title="累计碳排放量(万吨)" :value="12856">
+            <template #prefix>
+              <el-icon color="#f56c6c"><TrendCharts /></el-icon>
+            </template>
+          </el-statistic>
         </el-card>
       </el-col>
-      <el-col :span="12">
-        <el-card>
+      <el-col :span="6">
+        <el-card class="stat-card" shadow="hover">
+          <el-statistic title="减排完成率" :value="62.4" suffix="%">
+            <template #prefix>
+              <el-icon color="#67c23a"><CircleCheckFilled /></el-icon>
+            </template>
+          </el-statistic>
+        </el-card>
+      </el-col>
+      <el-col :span="6">
+        <el-card class="stat-card" shadow="hover">
+          <el-statistic title="监测企业数量" :value="156">
+            <template #prefix>
+              <el-icon color="#409eff"><OfficeBuilding /></el-icon>
+            </template>
+          </el-statistic>
+        </el-card>
+      </el-col>
+      <el-col :span="6">
+        <el-card class="stat-card" shadow="hover">
+          <el-statistic title="监测设备在线数" :value="1245">
+            <template #prefix>
+              <el-icon color="#e6a23c"><Connection /></el-icon>
+            </template>
+          </el-statistic>
+        </el-card>
+      </el-col>
+    </el-row>
+
+    <!-- 图表区 -->
+    <el-row :gutter="20" style="margin-top: 20px">
+      <el-col :span="14">
+        <el-card shadow="hover">
           <template #header>
-            <div class="card-header">
-              <span>系统信息</span>
-            </div>
+            <span>月度碳排放趋势图</span>
           </template>
-          <div class="system-info">
-            <p><strong>系统版本：</strong>v1.0.0</p >
-            <p><strong>技术栈：</strong>Spring Boot + Vue 3 + Element Plus</p >
-            <p><strong>当前时间：</strong>{{ currentTime }}</p >
-            <p><strong>运行状态：</strong><el-tag type="success">正常运行</el-tag></p >
-          </div>
+          <div ref="trendChart" style="height: 350px"></div>
+        </el-card>
+      </el-col>
+      <el-col :span="10">
+        <el-card shadow="hover">
+          <template #header>
+            <span>碳排放来源占比</span>
+          </template>
+          <div ref="pieChart" style="height: 350px"></div>
         </el-card>
       </el-col>
     </el-row>
@@ -77,84 +66,79 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
-import { User, Document, View, Bell } from '@element-plus/icons-vue'
+import { TrendCharts, CircleCheckFilled, OfficeBuilding, Connection } from '@element-plus/icons-vue'
+import * as echarts from 'echarts'
 
-const router = useRouter()
-
-const userCount = ref(1234)
-const dataCount = ref(5678)
-const visitCount = ref(910)
-const messageCount = ref(42)
-
-const currentTime = ref('')
-
-const updateTime = () => {
-  const now = new Date()
-  currentTime.value = now.toLocaleString('zh-CN', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit'
-  })
-}
-
-const goToData = () => {
-  router.push('/Manager/Data')
-}
-
-const goToUsers = () => {
-  router.push('/Manager/Data')
-}
-
-const viewStats = () => {
-  router.push('/Manager/Home')
-}
-
-const openSettings = () => {
-  router.push('/Manager/Home')
-}
+const trendChart = ref(null)
+const pieChart = ref(null)
 
 onMounted(() => {
-  updateTime()
-  setInterval(updateTime, 1000)
+  // 月度碳排放趋势图
+  const trendInstance = echarts.init(trendChart.value)
+  trendInstance.setOption({
+    tooltip: { trigger: 'axis' },
+    grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
+    xAxis: {
+      type: 'category',
+      data: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月']
+    },
+    yAxis: { type: 'value', name: '碳排放(万吨)' },
+    series: [
+      {
+        name: '2024年',
+        type: 'line',
+        data: [980, 920, 1050, 1100, 1080, 1150, 1200, 1180, 1120, 1050, 1000, 970],
+        smooth: true,
+        areaStyle: { color: 'rgba(64, 158, 255, 0.15)' }
+      },
+      {
+        name: '2025年',
+        type: 'line',
+        data: [940, 880, 1000, 1050, 1020, 1080, 1120, 1100, 1050, 990, 950, 920],
+        smooth: true,
+        areaStyle: { color: 'rgba(103, 194, 58, 0.15)' }
+      },
+      {
+        name: '目标线',
+        type: 'line',
+        data: [900, 850, 950, 1000, 980, 1020, 1050, 1030, 980, 930, 900, 870],
+        lineStyle: { type: 'dashed', color: '#e6a23c' },
+        itemStyle: { color: '#e6a23c' }
+      }
+    ]
+  })
+
+  // 碳排放来源占比图
+  const pieInstance = echarts.init(pieChart.value)
+  pieInstance.setOption({
+    tooltip: { trigger: 'item' },
+    legend: { bottom: '0%', orient: 'horizontal' },
+    series: [{
+      name: '来源占比',
+      type: 'pie',
+      radius: ['40%', '70%'],
+      avoidLabelOverlap: false,
+      itemStyle: { borderRadius: 10, borderColor: '#fff', borderWidth: 2 },
+      label: { show: true, formatter: '{b}\n{d}%' },
+      data: [
+        { value: 1048, name: '能源工业' },
+        { value: 735, name: '制造业' },
+        { value: 580, name: '交通运输' },
+        { value: 484, name: '建筑业' },
+        { value: 300, name: '农业' },
+        { value: 120, name: '其他' }
+      ]
+    }]
+  })
 })
 </script>
 
 <style scoped>
-.home-container {
-  padding: 20px;
+.dashboard-container {
+  padding: 0;
 }
 
-.welcome-card {
-  margin-bottom: 20px;
-}
-
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.welcome-text {
-  font-size: 18px;
-  font-weight: bold;
-}
-
-.welcome-content {
-  padding: 20px 0;
-}
-
-.quick-actions {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.system-info p {
-  margin: 10px 0;
-  line-height: 1.6;
+.stat-card {
+  text-align: center;
 }
 </style>

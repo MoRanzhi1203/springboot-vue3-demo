@@ -88,4 +88,35 @@ public class AdminController {
         adminService.removeByIds(idList);
         return R.success();
     }
+
+    // ==================== 登录 ====================
+    @PostMapping("/login")
+    @Operation(summary = "用户登录")
+    public R<Admin> login(@RequestBody Admin admin) {
+        LambdaQueryWrapper<Admin> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Admin::getUsername, admin.getUsername())
+               .eq(Admin::getPassword, admin.getPassword());
+        Admin loginUser = adminService.getOne(wrapper);
+        if (loginUser != null) {
+            // 登录成功，清除密码再返回
+            loginUser.setPassword(null);
+            return R.data(loginUser);
+        }
+        return R.fail("用户名或密码错误");
+    }
+
+    // ==================== 注册 ====================
+    @PostMapping("/register")
+    @Operation(summary = "用户注册")
+    public R<Void> register(@RequestBody Admin admin) {
+        // 检查用户名是否已存在
+        LambdaQueryWrapper<Admin> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Admin::getUsername, admin.getUsername());
+        long count = adminService.count(wrapper);
+        if (count > 0) {
+            return R.fail("用户已存在");
+        }
+        adminService.save(admin);
+        return R.success("注册成功");
+    }
 }
