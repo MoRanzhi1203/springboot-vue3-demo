@@ -1,0 +1,38 @@
+﻿{
+    "admin_list":  {
+                       "status":  "PASS",
+                       "pageSize":  5,
+                       "total":  16
+                   },
+    "admin_export":  {
+                         "status":  "NOT_IMPLEMENTED"
+                     },
+    "admin_delete":  {
+                         "id":  21,
+                         "status":  "PASS"
+                     },
+    "dashboard":  {
+                      "status":  "PASS"
+                  },
+    "admin_import":  {
+                         "status":  "RESPONDS"
+                     },
+    "admin_update":  {
+                         "id":  21,
+                         "status":  "PASS"
+                     },
+    "admin_add":  {
+                      "username":  "auto_user_20260624181917",
+                      "status":  "PASS",
+                      "id":  21
+                  },
+    "login":  {
+                  "account":  "test_admin",
+                  "status":  "PASS",
+                  "token":  "not_returned"
+              },
+    "admin_batchDelete":  {
+                              "count":  2,
+                              "status":  "PASS"
+                          }
+}

@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.example.springbootdemobackend.entity.Admin;
 import com.example.springbootdemobackend.response.R;
 import com.example.springbootdemobackend.service.AdminService;
+import com.example.springbootdemobackend.utils.JwtUtils;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import io.swagger.v3.oas.annotations.Operation;
@@ -12,13 +13,18 @@ import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/admin")
 public class AdminController {
     @Resource
     private AdminService adminService;
+
+    @Resource
+    private JwtUtils jwtUtils;
 
     // ==================== 新增 ====================
     @PostMapping("/add")
@@ -105,12 +111,19 @@ public class AdminController {
     // ==================== 登录 ====================
     @PostMapping("/login")
     @Operation(summary = "用户登录")
-    public R<Admin> login(@RequestBody Admin admin) {
+    public R<Map<String, Object>> login(@RequestBody Admin admin) {
         Admin loginUser = adminService.login(admin.getUsername(), admin.getPassword());
         if (loginUser != null) {
-            // 登录成功，清除密码再返回
+            // 生成 JWT Token
+            String token = jwtUtils.generateToken(loginUser.getId(), loginUser.getUsername());
+            // 清除密码
             loginUser.setPassword(null);
-            return R.data(loginUser);
+
+            // 返回 token + user
+            Map<String, Object> data = new LinkedHashMap<>();
+            data.put("token", token);
+            data.put("user", loginUser);
+            return R.data(data);
         }
         return R.fail("用户名或密码错误");
     }

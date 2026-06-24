@@ -1,0 +1,37 @@
+编号,分类,问题描述,状态,优先级,影响范围,相关文件,证据来源,建议处理方式
+F-01,数据库,admin 表缺少 deleted 字段,已修复,P0,后端查询报错,Admin.java init.sql,01-db-check-report.md,手动 ALTER TABLE 添加
+F-02,数据库,sex 字段 NOT NULL 无默认值导致新增失败,已修复,P0,用户注册/新增,Admin.java init.sql,01-db-check-report.md,MODIFY COLUMN sex DEFAULT NULL
+F-03,数据库,name/tel/headurl 字段 NOT NULL,已修复,P0,用户字段可空,Admin.java,01-db-check-report.md,MODIFY COLUMN 改为 DEFAULT NULL
+F-04,数据库,5 张业务表缺失(company/carbon_emission 等),已修复,P1,双碳业务全部不可用,init.sql,01-db-check-report.md,手动逐条 CREATE TABLE
+F-05,数据库,init.sql ADD COLUMN IF NOT EXISTS 语法不兼容,已修复,P0,后端启动失败,init.sql L3,init.sql 执行报错,改为 ADD COLUMN
+F-06,数据库,admin 表缺少 company_id/role_id/status/create_time/update_time,已修复,P1,用户扩展字段,Admin.java,测试中逐个 ALTER 添加,添加 5 个新字段
+F-07,后端编译,CarbonTrade 包路径错误,已修复,P0,编译失败,CarbonTrade.java,mvn compile 报错,修正为 com.example.springbootdemobackend.entity
+F-08,后端编译,AdminService 缺少 login/register 方法,已修复,P1,登录注册不可用,AdminService.java,Controller 调用失败,添加接口+实现
+F-09,后端编译,AdminController.add() 缺少 username 去重,已修复,P1,重复用户名可能插入,AdminController.java,代码审查,新增 checkWrapper
+F-10,后端编译,AdminController.list() 缺少 tel 查询参数,已修复,P2,按电话查询不可用,AdminController.java,代码审查,新增 @RequestParam tel
+F-11,用户管理,Data.vue 新增弹窗缺少 sex 选择器,已修复,P2,前端无法选择性别,Data.vue,代码审查,改为 el-select
+F-12,用户管理,Data.vue 批量删除后表格选择未清空,已修复,P2,UI 残留选中状态,Data.vue,代码审查,新增 clearSelection()
+F-13,前端构建,npm run build 失败,已修复,P0,前端无法部署,多个文件,构建日志,修复后构建成功 1.76s
+F-14,前端路由,路由 /Login /login 大小写混用,已修复,P1,跳转404,router/index.js Login.vue Register.vue,代码审查,统一为 /Login
+F-15,前端路由,登录后跳转 /Manager/Home 但 Dashboard 路由已变更,已修复,P1,登录后404,Login.vue,代码审查,改为 /Manager/Dashboard
+F-16,前端路由,Manager.vue 菜单路径和 router 不一致,已修复,P1,点击菜单空白,Manager.vue,代码审查,6个菜单项全部重写对齐
+F-17,前端路由,退出跳转 /login,已修复,P2,退出后404,Manager.vue,代码审查,改为 /Login
+F-18,前后端,Data.vue fetch 未携带 Authorization,已修复,P1,无认证请求头,Data.vue,代码审查,grep 验证4处已添加
+F-19,Dashboard,红色调试边框,已修复,P3,UI观感,Dashboard.vue,代码审查,grep 验证已无 border.red
+F-20,Dashboard,ECharts 未处理 resize 和 dispose,已修复,P3,窗口缩放时图表溢出,Dashboard.vue,代码审查,新增 listener + onBeforeUnmount
+F-21,测试账号,缺少 test_admin 账号,已修复,P2,无法登录测试,admin 表,测试登录失败,INSERT test_admin/123456
+U-01,登录认证,JWT 未接入—登录不返回 token,未修复,P1,所有接口无认证保护,AdminController.java,admin-api-test-result.json,接入 Spring Security + JWT
+U-02,登录认证,auth.js 仍使用 btoa 伪造 token,未修复,P1,前端认证逻辑错误,stores/auth.js L11,代码审查,等后端返回真实 token 后移除 fallback
+U-03,用户管理,admin/export 接口不存在,未修复,P1,无法导出用户数据,AdminController.java,admin-api-test-result.json,实现 Excel 导出功能
+U-04,用户管理,admin/import 无文件上传逻辑,部分修复,P1,无法导入用户数据,AdminController.java,admin-api-test-result.json,实现 multipart 解析
+U-05,Dashboard,Dashboard 数据全为0—5张业务表无数据,未修复,P1,Dashboard 图表空白,5张业务表,admin-api-test-result.json,插入测试数据
+U-06,角色权限,role/permission/role_permission 表未创建,未修复,P1,角色权限完全不可用,init.sql,01-db-check-report.md,创建表结构+后端代码
+U-07,日志管理,日志模块完全未启动,未修复,P1,操作日志不可用,—,full-test-report.md,创建日志表+AOP
+U-08,登录认证,密码明文存储,未修复,P2,安全风险,AdminServiceImpl.java,代码审查,接入 BCryptPasswordEncoder
+U-09,双碳业务,5张业务表无初始化样例数据,未修复,P2,Dashboard 显示空数据,init.sql,full-test-report.md,补 INSERT 样例数据
+U-10,导入导出,导出模板下载接口未实现,未修复,P2,用户无法获取导入模板,—,full-test-report.md,新增模板下载接口
+V-01,双碳业务,5个业务模块 CRUD 端到端未测试,待验证,P1,编译通过未运行实际操作,5个Controller,04-carbon-business-api-report.md,插入测试数据后执行完整CRUD
+V-02,双碳业务,前端5个业务页面未联调测试,待验证,P2,页面可能渲染异常,5个.vue文件,full-test-report.md,启动前端+数据后验证
+V-03,导入导出,admin/import 端点是否真正可用,待验证,P1,不确定能否解析 Excel,AdminController.java,admin-api-test-result.json,构造 multipart 测试
+V-04,Dashboard,数据更新后图表是否正常,待验证,P1,不确定图表渲染,Home.vue/Dashboard.vue,full-test-report.md,插数据后刷新验证
+V-05,登录认证,登录状态刷新后是否保持,待验证,P2,不确定 localStorage 恢复,stores/auth.js,full-test-report.md,完整前后端测试

@@ -85,3 +85,8 @@ mybatis-plus:
 # ==================== 服务端口 ====================
 server:
   port: 8080
+
+# ==================== JWT 配置 ====================
+jwt:
+  secret: mySecretKeyForJwtTokenGenerationAndValidation2024SecretKey
+  expiration: 86400000

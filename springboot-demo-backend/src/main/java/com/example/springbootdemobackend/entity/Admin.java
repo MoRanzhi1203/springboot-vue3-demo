@@ -9,6 +9,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 /**
  * 用户实体类
  */
@@ -45,4 +47,10 @@ public class Admin {
     @TableLogic
     @Schema(description = "逻辑删除(0=未删除,1=已删除)", hidden = true)
     private Integer deleted;
+
+    private Long companyId;
+    private Long roleId;
+    private Integer status;
+    private LocalDateTime createTime;
+    private LocalDateTime updateTime;
 }

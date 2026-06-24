@@ -2,11 +2,9 @@
   <div style="display: flex; flex-direction: column; height: 100vh">
     <!-- 顶部栏 -->
     <div style="height: 60px; background: #409eff; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; color: #fff">
-      <div style="font-size: 18px; font-weight: bold">
-        双方碳智能监测与预测平台
-      </div>
+      <div style="font-size: 18px; font-weight: bold">双方碳智能监测与预测平台</div>
       <div style="display: flex; align-items: center; gap: 15px">
-        <span>{{ loginUser?.name || loginUser?.username || '管理员' }}</span>
+        <span>{{ authStore.user?.name || authStore.user?.username || '未登录' }}</span>
         <el-button type="danger" size="small" @click="handleLogout">退出登录</el-button>
       </div>
     </div>
@@ -15,42 +13,33 @@
       <!-- 左侧菜单 -->
       <div style="width: 220px; border-right: 1px solid #ddd; overflow-y: auto">
         <el-menu :default-active="route.path" router style="border: 0">
-          <el-menu-item index="/Manager/Home">
-            <el-icon><HomeFilled /></el-icon>
-            <span>首页数据概览</span>
+          <el-menu-item index="/Manager/Dashboard">
+            <el-icon><HomeFilled /></el-icon><span>系统首页</span>
           </el-menu-item>
-
-          <el-sub-menu index="monitor">
-            <template #title>
-              <el-icon><Monitor /></el-icon>
-              <span>数据监测</span>
-            </template>
-            <el-menu-item index="/Manager/Monitor">数据监测面板</el-menu-item>
-          </el-sub-menu>
-
-          <el-sub-menu index="analysis">
-            <template #title>
-              <el-icon><TrendCharts /></el-icon>
-              <span>碳排放分析</span>
-            </template>
-            <el-menu-item index="/Manager/Analysis">碳排放分析</el-menu-item>
-          </el-sub-menu>
-
-          <el-menu-item index="/Manager/Emission">
-            <el-icon><Aim /></el-icon>
-            <span>减排管理</span>
+          <el-menu-item index="/Manager/Data">
+            <el-icon><User /></el-icon><span>用户管理</span>
           </el-menu-item>
-
-          <el-sub-menu index="system">
-            <template #title>
-              <el-icon><Setting /></el-icon>
-              <span>系统设置</span>
-            </template>
-            <el-menu-item index="/Manager/Data">用户管理</el-menu-item>
-            <el-menu-item index="/Manager/Role">角色管理</el-menu-item>
-            <el-menu-item index="/Manager/Permission">权限管理</el-menu-item>
-            <el-menu-item index="/Manager/Log">日志管理</el-menu-item>
-          </el-sub-menu>
+          <el-menu-item index="/Manager/Company">
+            <el-icon><OfficeBuilding /></el-icon><span>企业账户管理</span>
+          </el-menu-item>
+          <el-menu-item index="/Manager/CarbonEmission">
+            <el-icon><TrendCharts /></el-icon><span>碳排放管理</span>
+          </el-menu-item>
+          <el-menu-item index="/Manager/CarbonTrade">
+            <el-icon><Coin /></el-icon><span>碳交易管理</span>
+          </el-menu-item>
+          <el-menu-item index="/Manager/NewEnergyProject">
+            <el-icon><Sunny /></el-icon><span>新能源项目管理</span>
+          </el-menu-item>
+          <el-menu-item index="/Manager/EnergySavingGoal">
+            <el-icon><Aim /></el-icon><span>节能减排目标管理</span>
+          </el-menu-item>
+          <el-menu-item index="/Manager/Role">
+            <el-icon><Key /></el-icon><span>角色管理</span>
+          </el-menu-item>
+          <el-menu-item index="/Manager/Permission">
+            <el-icon><Lock /></el-icon><span>权限管理</span>
+          </el-menu-item>
         </el-menu>
       </div>
 
@@ -65,21 +54,15 @@
 <script setup>
 import { RouterView } from 'vue-router'
 import { useRouter, useRoute } from 'vue-router'
-import { HomeFilled, Monitor, TrendCharts, Aim, Setting } from '@element-plus/icons-vue'
+import { HomeFilled, User, OfficeBuilding, TrendCharts, Coin, Sunny, Aim, Key, Lock } from '@element-plus/icons-vue'
 import { useAuthStore } from '../stores/auth'
 
 const router = useRouter()
 const route = useRoute()
 const authStore = useAuthStore()
 
-// 从 authStore 获取当前登录用户信息
-const loginUser = authStore.user
-
 const handleLogout = () => {
   authStore.logout()
-  router.push('/login')
+  router.push('/Login')
 }
 </script>
-
-<style scoped>
-</style>

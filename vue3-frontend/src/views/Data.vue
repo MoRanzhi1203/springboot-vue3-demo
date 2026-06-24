@@ -25,10 +25,11 @@
         <el-table-column prop="sex" label="性别" width="80" />
         <el-table-column prop="tel" label="电话" />
         <el-table-column prop="headurl" label="头像" min-width="200" show-overflow-tooltip />
-        <el-table-column label="操作" width="180" fixed="right">
+        <el-table-column label="操作" width="270" fixed="right">
           <template #default="{ row }">
             <el-button type="primary" size="small" @click="openEditDialog(row)">编辑</el-button>
             <el-button type="danger" size="small" @click="handleDelete(row.id)">删除</el-button>
+            <el-button type="success" size="small" @click="openRoleDialog(row)">分配角色</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -87,6 +88,12 @@
         </template>
       </el-dialog>
     </div>
+
+    <!-- 分配角色弹窗 -->
+    <el-dialog v-model="roleVisible" title="分配角色" width="400px">
+      <el-form label-width="60px"><el-form-item label="角色"><el-select v-model="selectedRoleId" placeholder="请选择角色" style="width:100%"><el-option v-for="r in allRoles" :key="r.id" :label="r.roleName" :value="r.id"/></el-select></el-form-item></el-form>
+      <template #footer><el-button @click="roleVisible=false">取消</el-button><el-button type="primary" @click="saveRole">保存</el-button></template>
+    </el-dialog>
   </div>
 </template>
 
@@ -97,8 +104,27 @@ import { ElMessage, ElMessageBox } from "element-plus";
 import { useAuthStore } from '@/stores/auth.js'
 
 const authStore = useAuthStore()
-// 表格组件引用
 const tableRef = ref(null)
+
+// ==================== 分配角色 ====================
+const roleVisible = ref(false)
+const allRoles = ref([])
+const selectedRoleId = ref(null)
+const currentAssignUserId = ref(null)
+
+const headers = () => ({ 'Content-Type': 'application/json', 'Authorization': authStore.getAuthorizationHeader() })
+
+const openRoleDialog = async (row) => {
+  currentAssignUserId.value = row.id; selectedRoleId.value = row.roleId || null; roleVisible.value = true
+  try { const r = await fetch('/api/role/all', { headers: headers() }).then(r => r.json()); if (r.code === 200) allRoles.value = r.data || [] } catch (e) {}
+}
+
+const saveRole = async () => {
+  try {
+    const r = await fetch('/api/role/assignUserRole', { method: 'POST', headers: headers(), body: JSON.stringify({ userId: currentAssignUserId.value, roleId: selectedRoleId.value }) }).then(r => r.json())
+    if (r.code === 200) { ElMessage.success('分配角色成功'); roleVisible.value = false; fetchData() } else ElMessage.error(r.message)
+  } catch (e) { ElMessage.error('分配角色失败') }
+}
 
 const data = reactive({
   name: '',

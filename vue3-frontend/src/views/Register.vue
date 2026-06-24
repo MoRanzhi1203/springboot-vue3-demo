@@ -33,7 +33,7 @@
         </el-form-item>
 
         <div style="text-align: center">
-          已有账号？<el-link type="primary" @click="router.push('/login')">立即登录</el-link>
+          已有账号？<el-link type="primary" @click="router.push('/Login')">立即登录</el-link>
         </div>
       </el-form>
     </div>
@@ -98,7 +98,7 @@ const handleRegister = async () => {
 
     if (result.code === 200) {
       ElMessage.success('注册成功，请登录')
-      router.push('/login')
+      router.push('/Login')
     } else {
       ElMessage.error(result.message || '注册失败')
     }

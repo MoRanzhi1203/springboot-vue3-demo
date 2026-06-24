@@ -25,7 +25,7 @@
         </el-form-item>
 
         <div style="text-align: center">
-          还没有账号？<el-link type="primary" @click="router.push('/register')">立即注册</el-link>
+          还没有账号？<el-link type="primary" @click="router.push('/Register')">立即注册</el-link>
         </div>
       </el-form>
     </div>
@@ -95,7 +95,7 @@ const handleLogin = async () => {
       ElMessage.success('登录成功')
       // 使用 Pinia authStore 保存登录状态
       authStore.login(result.data)
-      router.push('/Manager/Home')
+      router.push('/Manager/Dashboard')
     } else {
       ElMessage.error(result.message || '用户名或密码错误')
       refreshCaptcha()
